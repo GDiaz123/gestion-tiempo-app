@@ -30,23 +30,23 @@ class TareaController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'titulo' => 'required|max:255',
-            'descripcion' => 'nullable',
-            'prioridad' => 'required|in:baja,media,alta',
+            'titulo' => 'required|string|max:255',
+            'descripcion' => 'nullable|string',
             'fecha_limite' => 'nullable|date',
+            'prioridad' => 'required|in:baja,media,alta',
         ]);
 
         Tarea::create([
-            'user_id' => auth()->id(),
             'titulo' => $request->titulo,
             'descripcion' => $request->descripcion,
-            'prioridad' => $request->prioridad,
             'fecha_limite' => $request->fecha_limite,
+            'prioridad' => $request->prioridad,
+            'user_id' => auth()->id(),
         ]);
 
-        return redirect()->route('tareas.index')
-                         ->with('success', 'Tarea creada correctamente');
+        return redirect()->route('tareas.index')->with('success', 'Tarea creada correctamente');
     }
+
 
     /**
      * Display the specified resource.
@@ -88,7 +88,7 @@ class TareaController extends Controller
         ]);
 
         return redirect()->route('tareas.index')
-                         ->with('success', 'Tarea actualizada correctamente');
+            ->with('success', 'Tarea actualizada correctamente');
     }
 
     /**
@@ -101,7 +101,7 @@ class TareaController extends Controller
         $tarea->delete();
 
         return redirect()->route('tareas.index')
-                         ->with('success', 'Tarea eliminada correctamente');
+            ->with('success', 'Tarea eliminada correctamente');
     }
 
     public function calendar()

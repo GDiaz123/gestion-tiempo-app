@@ -2,23 +2,30 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Evento;
 use Illuminate\Http\Request;
-use App\Models\Tarea;
+use Illuminate\Support\Facades\Mail;
 
 class CalendarController extends Controller
 {
     public function index()
     {
-        $tareas = Tarea::where('user_id', auth()->id())->get();
+        $eventos = Evento::all();
+        return view('calendar.index', compact('eventos'));
+    }
 
-        $events = $tareas->map(function ($tarea) {
-            return [
-                'title' => $tarea->titulo,
-                'start' => $tarea->fecha_limite,
-                'url'   => route('tareas.show', $tarea),
-            ];
-        });
+    public function store(Request $request)
+    {
+        $evento = Evento::create([
+            'user_id' => auth()->id(),
+            'title' => $request->title,
+            'start_datetime' => "{$request->date} {$request->start_time}",
+            'end_datetime' => "{$request->date} {$request->end_time}",
+        ]);
 
-        return view('calendar.index', compact('events'));
+        // Aquí puedes enviar el correo programado usando queue
+        // Mail::to(auth()->user()->email)->later(...)
+
+        return redirect()->route('calendar')->with('success', 'Evento creado');
     }
 }

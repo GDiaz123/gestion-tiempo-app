@@ -1,25 +1,49 @@
 @extends('layouts.app')
 
-@extends('layouts.app')
-
 @section('content')
-<h2 class="text-2xl font-bold mb-4">Calendario</h2>
-<div id='calendar'></div>
+<div>
+    <h1 class="text-2xl font-bold mb-4">Calendario</h1>
+
+    <div class="grid grid-cols-7 gap-2 text-center">
+        @php
+            $daysInMonth = now()->daysInMonth;
+            $startDay = now()->startOfMonth()->dayOfWeekIso;
+        @endphp
+
+        @for ($i = 1; $i < $startDay; $i++)
+            <div></div>
+        @endfor
+
+        @for ($day = 1; $day <= $daysInMonth; $day++)
+            @php
+                $date = now()->startOfMonth()->addDays($day-1)->toDateString();
+                $today = now()->toDateString() == $date;
+            @endphp
+            <div 
+                class="border p-2 cursor-pointer hover:bg-indigo-100 {{ $today ? 'bg-indigo-300 text-white' : '' }}" 
+                onclick="openModal('{{ $date }}')">
+                {{ $day }}
+                @foreach($eventos as $evento)
+                    @if($evento->date == $date)
+                        <div class="text-xs mt-1 bg-green-100 rounded px-1">{{ $evento->title }}</div>
+                    @endif
+                @endforeach
+            </div>
+        @endfor
+    </div>
+</div>
+
+@include('calendar._modal')
 @endsection
 
-@section('scripts')
-<link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/main.min.css' rel='stylesheet' />
-<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/main.min.js'></script>
-
+@push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    var calendarEl = document.getElementById('calendar');
-    var calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'dayGridMonth',
-        locale: 'es',
-        events: @json($events),
-    });
-    calendar.render();
-});
+function openModal(date) {
+    document.getElementById('eventDate').value = date;
+    document.getElementById('modal').classList.remove('hidden');
+}
+function closeModal() {
+    document.getElementById('modal').classList.add('hidden');
+}
 </script>
-@endsection
+@endpush
