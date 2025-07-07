@@ -14,15 +14,19 @@
             <h1 class="text-xl font-bold">
                 <a href="{{ route('dashboard') }}">TimeUp</a>
             </h1>
-            <nav class="space-x-4">
+            <nav class="space-x-4 flex items-center gap-4">
                 <a href="{{ route('tareas.index') }}" class="hover:underline">Tareas</a>
                 <a href="{{ route('calendar.index') }}" class="hover:underline">Calendario</a>
                 <a href="{{ url('/pomodoro') }}" class="hover:underline">Pomodoro</a>
+
+                <span class="text-gray-600"> {{ Auth::user()->name }}</span>
+
                 <form action="{{ route('logout') }}" method="POST" class="inline">
                     @csrf
                     <button class="hover:underline">Salir</button>
                 </form>
             </nav>
+
         </div>
     </header>
 

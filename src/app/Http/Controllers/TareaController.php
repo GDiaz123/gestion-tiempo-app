@@ -4,17 +4,41 @@ namespace App\Http\Controllers;
 
 use App\Models\Tarea;
 use Illuminate\Http\Request;
-
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 class TareaController extends Controller
 {
+    use AuthorizesRequests;
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $tareas = Tarea::where('user_id', auth()->id())->get();
-        return view('tareas.index', compact('tareas'));
+        $query = Tarea::query()
+            ->where('user_id', auth()->id());
+
+        // Filtro por prioridad
+        if ($request->filled('prioridad') && in_array($request->prioridad, ['alta', 'media', 'baja'])) {
+            $query->where('prioridad', $request->prioridad);
+        }
+
+        // Filtro por estado
+        if ($request->filled('estado')) {
+            if ($request->estado === 'completada') {
+                $query->where('completada', 1);
+            } elseif ($request->estado === 'pendiente') {
+                $query->where('completada', 0);
+            }
+        }
+
+        $tareas = $query->get();
+
+        return view('tareas.index', [
+            'tareas' => $tareas,
+            'prioridad' => $request->prioridad,
+            'estado' => $request->estado,
+        ]);
     }
+
 
     /**
      * Show the form for creating a new resource.
@@ -117,4 +141,13 @@ class TareaController extends Controller
 
         return view('calendar.index', ['events' => $events]);
     }
+    public function completar(Tarea $tarea)
+    {
+        $this->authorize('update', $tarea);
+
+        $tarea->update(['completada' => true]);
+
+        return redirect()->route('tareas.index')->with('success', 'Tarea marcada como completada.');
+    }
+
 }

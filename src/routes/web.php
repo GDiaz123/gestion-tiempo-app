@@ -6,6 +6,8 @@ use App\Http\Controllers\TareaController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\EventoController; // Agregado
 
+
+
 Route::get('/', function () {
     return view('welcome');
 });
@@ -20,6 +22,9 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::resource('tareas', TareaController::class);
+    Route::patch('/tareas/{tarea}/completar', [TareaController::class, 'completar'])->name('tareas.completar');
+
+
 
     Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar.index');
     Route::post('/calendar', [CalendarController::class, 'store'])->name('calendar.store');
@@ -28,7 +33,9 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/pomodoro', function () {
         return view('pomodoro.index');
-    });
+    })->name('pomodoro'); // Añade ->name('pomodoro') aquí
+
+    
 });
 
 require __DIR__.'/auth.php';

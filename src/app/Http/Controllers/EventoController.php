@@ -15,15 +15,21 @@ class EventoController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'date' => 'required|date',
-            'start_time' => 'required',
-            'end_time' => 'required|after:start_time',
-        ]);
+    $request->validate([
+        'title' => 'required|string|max:255',
+        'date' => 'required|date',
+        'start_time' => 'nullable',
+        'end_time' => 'nullable',
+    ]);
 
-        Evento::create($request->only('title', 'date', 'start_time', 'end_time'));
+    Evento::create([
+        'title' => $request->title,
+        'date' => $request->date,
+        'start_time' => $request->start_time,
+        'end_time' => $request->end_time,
+        'user_id' => auth()->id(),
+    ]);
 
-        return redirect()->route('eventos.index')->with('success', 'Evento creado');
+    return redirect()->route('calendar.index')->with('success', 'Evento agregado correctamente.');
     }
 }
